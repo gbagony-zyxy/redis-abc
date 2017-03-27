@@ -8,8 +8,6 @@
 			http://www.springframework.org/schema/context
 			http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
-    <context:property-placeholder location="classpath*:redis.properties"/>
-
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
         <property name="maxIdle" value="${redis.maxIdle}"/>
         <property name="maxWaitMillis" value="${redis.maxWait}"/>
@@ -21,9 +19,19 @@
         <property name="password" value="${redis.pass}"/>
         <property name="port" value="${redis.port}"/>
         <property name="poolConfig" ref="poolConfig"/>
+        <property name="timeout" value="${redis.timeout}"/>
     </bean>
 
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory" ref="connectionFactory"/>
+        <!--针对键值采用不同的序列化策略-->
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
     </bean>
+
+    <!--cache配置-->
 </beans>
